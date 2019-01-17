@@ -6,14 +6,9 @@ import java.lang.ref.WeakReference;
 
 public class SearchTask extends AsyncTask<SearchApiRequest, Void, SearchApiResponse> {
 
-    public interface Callback
-    {
-        void onSearchCompleted(SearchApiResponse response);
-    }
+    private WeakReference<SearchExecutor.Callback> mCallback;
 
-    private WeakReference<Callback> mCallback;
-
-    public SearchTask(Callback callback)
+    public SearchTask(SearchExecutor.Callback callback)
     {
         mCallback = new WeakReference<>(callback);
     }

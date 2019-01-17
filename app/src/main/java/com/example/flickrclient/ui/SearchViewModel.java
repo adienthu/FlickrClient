@@ -3,20 +3,21 @@ package com.example.flickrclient.ui;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
-import android.os.AsyncTask;
+import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
 
 import com.example.flickrclient.model.Photo;
+import com.example.flickrclient.service.factory.FactoryLocator;
 import com.example.flickrclient.service.search.SearchApiRequest;
 import com.example.flickrclient.service.search.SearchApiResponse;
-import com.example.flickrclient.service.search.SearchTask;
+import com.example.flickrclient.service.search.SearchExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchViewModel extends AndroidViewModel implements SearchTask.Callback {
+public class SearchViewModel extends ViewModel implements SearchExecutor.Callback {
 
-    enum SearchStatus
+    public enum SearchStatus
     {
         IDLE,
         RUNNING,
@@ -25,14 +26,13 @@ public class SearchViewModel extends AndroidViewModel implements SearchTask.Call
 
     private static final int NUM_RESULTS_PER_PAGE = 20;
 
-    private SearchTask mSearchTask;
+    private SearchExecutor mSearchExecutor;
     private String mSearchQuery;
     private MutableLiveData<SearchStatus> mSearchStatus;
     private MutableLiveData<List<Photo>> mPhotos;
     private int mNumPagesRemaining;
 
-    public SearchViewModel(@NonNull Application application) {
-        super(application);
+    public SearchViewModel() {
         mPhotos = new MutableLiveData<>();
         mSearchStatus = new MutableLiveData<>();
         mSearchStatus.setValue(SearchStatus.IDLE);
@@ -52,13 +52,13 @@ public class SearchViewModel extends AndroidViewModel implements SearchTask.Call
         {
             mSearchQuery = query;
             mSearchStatus.setValue(SearchStatus.RUNNING);
-            if (mSearchTask != null && (mSearchTask.getStatus()==AsyncTask.Status.PENDING || mSearchTask.getStatus()==AsyncTask.Status.RUNNING))
+            if (mSearchExecutor != null)
             {
-                mSearchTask.cancel(true);
+                mSearchExecutor.cancel();
             }
-            mSearchTask = new SearchTask(this);
+            mSearchExecutor = FactoryLocator.getFactory().createSearchTask(this);
             SearchApiRequest request = new SearchApiRequest(query, 1, NUM_RESULTS_PER_PAGE);
-            mSearchTask.execute(request);
+            mSearchExecutor.executeRequest(request);
         }
     }
 

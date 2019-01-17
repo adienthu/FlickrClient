@@ -12,4 +12,11 @@ public class SearchApiRequest {
         mNumResultsPerPage = numResultsPerPage;
     }
 
+    public String getQueryString() {
+        return mQueryString;
+    }
+
+    public int getPage() {
+        return mPage;
+    }
 }

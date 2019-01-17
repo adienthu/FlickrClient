@@ -17,6 +17,13 @@ public class SearchApiResponse {
     private int mPage;
     private int mNumPagesRemaining;
 
+    public SearchApiResponse(Status status, List<Photo> photos, int page, int numPagesRemaining) {
+        this.mStatus = status;
+        this.mPhotos = photos;
+        this.mPage = page;
+        this.mNumPagesRemaining = numPagesRemaining;
+    }
+
     public Status getStatus() {
         return mStatus;
     }
