@@ -1,6 +1,8 @@
 package com.example.flickrclient.ui;
 
 import android.app.SearchManager;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -16,10 +18,14 @@ public class SearchActivity extends AppCompatActivity {
 
     private static String LOG_TAG = "SearchActivity";
 
+    private SearchViewModel mViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
+        mViewModel = ViewModelProviders.of(this).get(SearchViewModel.class);
     }
 
     @Override
@@ -28,7 +34,7 @@ public class SearchActivity extends AppCompatActivity {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             Log.d(LOG_TAG, "New query: " + query);
-            // TODO: update viewmodel
+            mViewModel.search(query);
         }
     }
 

@@ -6,4 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".ui.SearchActivity">
 
+    <fragment
+        android:tag="SearchFragment"
+        android:name="com.example.flickrclient.ui.SearchFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_search"/>
+
 </android.support.constraint.ConstraintLayout>
