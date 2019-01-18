@@ -63,7 +63,7 @@ public class SearchViewModelUnitTest {
     @Test
     public void searchCompletion_onSuccess() {
         List<Photo> photoList = new ArrayList<>();
-        photoList.add(new Photo());
+        photoList.add(new Photo("",""));
         SearchApiResponse response = new SearchApiResponse(SearchApiResponse.Status.SUCCESS, photoList, 1, 1);
         SearchViewModel viewModel = new SearchViewModel();
         viewModel.onSearchCompleted(response);
@@ -74,13 +74,13 @@ public class SearchViewModelUnitTest {
     @Test
     public void searchCompletion_onSuccess_nextPage() {
         List<Photo> photoList1 = new ArrayList<>();
-        photoList1.add(new Photo());
+        photoList1.add(new Photo("",""));
         SearchApiResponse response1 = new SearchApiResponse(SearchApiResponse.Status.SUCCESS, photoList1, 1, 2);
         SearchViewModel viewModel = new SearchViewModel();
         viewModel.onSearchCompleted(response1);
 
         List<Photo> photoList2 = new ArrayList<>();
-        photoList2.add(new Photo());
+        photoList2.add(new Photo("",""));
         SearchApiResponse response2 = new SearchApiResponse(SearchApiResponse.Status.SUCCESS, photoList2, 2, 1);
         viewModel.onSearchCompleted(response2);
 

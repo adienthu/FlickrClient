@@ -41,6 +41,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
 
     public void refreshList(List<Photo> photos) {
         mPhotos = photos;
+        notifyDataSetChanged();
     }
 
     class SearchViewHolder extends RecyclerView.ViewHolder

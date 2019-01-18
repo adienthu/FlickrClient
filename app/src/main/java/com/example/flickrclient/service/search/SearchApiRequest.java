@@ -19,4 +19,8 @@ public class SearchApiRequest {
     public int getPage() {
         return mPage;
     }
+
+    public int getNumResultsPerPage() {
+        return mNumResultsPerPage;
+    }
 }
