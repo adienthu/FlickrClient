@@ -31,6 +31,9 @@ public class SearchFragment extends Fragment implements SearchAdapter.Callback {
     private View mProgressView;
     private View mErrorView;
     private Button mRetryButton;
+    private View mTopErrorView;
+    private View mTopProgressView;
+    private Button mTopRetryButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,16 +67,34 @@ public class SearchFragment extends Fragment implements SearchAdapter.Callback {
                     if (searchStatus == SearchViewModel.SearchStatus.IDLE) {
                         mProgressView.setVisibility(View.GONE);
                         mErrorView.setVisibility(View.GONE);
+//                        mSnackbar.dismiss();
+                        mTopProgressView.setVisibility(View.GONE);
+                        mTopErrorView.setVisibility(View.GONE);
                     }
-                    else if(searchStatus == SearchViewModel.SearchStatus.RUNNING && mViewModel.getCurrentPage()==0) {
-                        mProgressView.setVisibility(View.VISIBLE);
-                        mErrorView.setVisibility(View.GONE);
+                    else if(searchStatus == SearchViewModel.SearchStatus.RUNNING) {
+                        if (mViewModel.getCurrentPage() == 0) {
+                            mProgressView.setVisibility(View.VISIBLE);
+                            mErrorView.setVisibility(View.GONE);
+
+                            mTopProgressView.setVisibility(View.GONE);
+                            mTopErrorView.setVisibility(View.GONE);
+                        }else {
+                            mTopProgressView.setVisibility(View.VISIBLE);
+                            mTopErrorView.setVisibility(View.GONE);
+
+                            mProgressView.setVisibility(View.GONE);
+                            mErrorView.setVisibility(View.GONE);
+                        }
                     }
                     else if(searchStatus == SearchViewModel.SearchStatus.ERROR) {
                         if (mViewModel.getCurrentPage() == 0) {
                             mErrorView.setVisibility(View.VISIBLE);
+                            mProgressView.setVisibility(View.GONE);
+                        }else {
+                            mTopErrorView.setVisibility(View.VISIBLE);
+                            mTopProgressView.setVisibility(View.GONE);
                         }
-                        mProgressView.setVisibility(View.GONE);
+
                     }
                 }
             });
@@ -98,6 +119,18 @@ public class SearchFragment extends Fragment implements SearchAdapter.Callback {
                     mViewModel.retry();
             }
         });
+
+        mTopProgressView = root.findViewById(R.id.top_progress_text);
+        mTopErrorView = root.findViewById(R.id.top_error_view);
+        mTopRetryButton = mTopErrorView.findViewById(R.id.top_retry_button);
+        mTopRetryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mViewModel != null)
+                    mViewModel.retry();
+            }
+        });
+
         return root;
     }
 
