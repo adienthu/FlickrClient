@@ -49,7 +49,7 @@ public class SearchViewModel extends ViewModel implements SearchExecutor.Callbac
 
     public void search(String query)
     {
-        if (query!=null && !query.isEmpty() && !query.equalsIgnoreCase(mSearchQuery))
+        if (query!=null && !query.isEmpty())
         {
             mSearchQuery = query;
             mCurrentPage = 0;
@@ -67,6 +67,12 @@ public class SearchViewModel extends ViewModel implements SearchExecutor.Callbac
 
     public int getCurrentPage() {
         return mCurrentPage;
+    }
+
+    public void retry() {
+        if (mCurrentPage == 0) {
+            search(mSearchQuery);
+        }
     }
 
     public void fetchNextPage()
@@ -102,10 +108,8 @@ public class SearchViewModel extends ViewModel implements SearchExecutor.Callbac
             mSearchStatus.setValue(SearchStatus.IDLE);
         }else if (response.getStatus() == SearchApiResponse.Status.ERROR) {
             mSearchStatus.setValue(SearchStatus.ERROR);
-            mSearchQuery = null;
         }else {
             mSearchStatus.setValue(SearchStatus.IDLE);
-            mSearchQuery = null;
         }
     }
 }

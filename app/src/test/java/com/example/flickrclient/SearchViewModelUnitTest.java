@@ -198,4 +198,29 @@ public class SearchViewModelUnitTest {
         assertEquals(SearchViewModel.SearchStatus.IDLE, viewModel.getSearchStatus().getValue());
         verify(sFactoryMock, times(1)).createSearchTask(viewModel);
     }
+
+    @Test
+    public void retry_newSearch() {
+        SearchViewModel viewModel = new SearchViewModel();
+        final String query = "kittens";
+        SearchExecutor searchMock = mock(SearchExecutor.class);
+        when(sFactoryMock.createSearchTask(viewModel)).thenReturn(searchMock);
+
+        viewModel.search(query);
+
+        List<Photo> photoList = new ArrayList<>();
+        photoList.add(new Photo("",""));
+        final int numPagesRemaining = 0;
+        SearchApiResponse response = new SearchApiResponse(SearchApiResponse.Status.ERROR, photoList, 1, numPagesRemaining);
+
+        viewModel.onSearchCompleted(response);
+
+        assertEquals(SearchViewModel.SearchStatus.ERROR, viewModel.getSearchStatus().getValue());
+        assertEquals(0, viewModel.getCurrentPage());
+
+        viewModel.retry();
+
+        assertEquals(SearchViewModel.SearchStatus.RUNNING, viewModel.getSearchStatus().getValue());
+        verify(sFactoryMock, times(2)).createSearchTask(viewModel);
+    }
 }
