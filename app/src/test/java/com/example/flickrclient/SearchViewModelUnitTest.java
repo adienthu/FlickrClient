@@ -208,10 +208,8 @@ public class SearchViewModelUnitTest {
 
         viewModel.search(query);
 
-        List<Photo> photoList = new ArrayList<>();
-        photoList.add(new Photo("",""));
-        final int numPagesRemaining = 0;
-        SearchApiResponse response = new SearchApiResponse(SearchApiResponse.Status.ERROR, photoList, 1, numPagesRemaining);
+        List<Photo> photoList = Collections.emptyList();
+        SearchApiResponse response = new SearchApiResponse(SearchApiResponse.Status.ERROR, photoList, 1, 0);
 
         viewModel.onSearchCompleted(response);
 
@@ -222,5 +220,46 @@ public class SearchViewModelUnitTest {
 
         assertEquals(SearchViewModel.SearchStatus.RUNNING, viewModel.getSearchStatus().getValue());
         verify(sFactoryMock, times(2)).createSearchTask(viewModel);
+    }
+
+    @Test
+    public void retry_nextPage() {
+        SearchViewModel viewModel = new SearchViewModel();
+        final String query = "kittens";
+        SearchExecutor searchMock = mock(SearchExecutor.class);
+        when(sFactoryMock.createSearchTask(viewModel)).thenReturn(searchMock);
+
+        viewModel.search(query);
+
+        List<Photo> photoList = new ArrayList<>();
+        photoList.add(new Photo("",""));
+        SearchApiResponse response = new SearchApiResponse(SearchApiResponse.Status.SUCCESS, photoList, 1, 10);
+
+        viewModel.onSearchCompleted(response);
+
+        assertEquals(SearchViewModel.SearchStatus.IDLE, viewModel.getSearchStatus().getValue());
+        assertEquals(1, viewModel.getCurrentPage());
+
+        viewModel.fetchNextPage();
+
+        List<Photo> photoList2 = Collections.emptyList();
+        SearchApiResponse response2 = new SearchApiResponse(SearchApiResponse.Status.ERROR, photoList2, 2, 0);
+
+        viewModel.onSearchCompleted(response2);
+
+        assertEquals(SearchViewModel.SearchStatus.ERROR, viewModel.getSearchStatus().getValue());
+        assertEquals(1, viewModel.getCurrentPage());
+
+        SearchExecutor searchMock2 = mock(SearchExecutor.class);
+        when(sFactoryMock.createSearchTask(viewModel)).thenReturn(searchMock2);
+
+        viewModel.retry();
+
+        ArgumentCaptor<SearchApiRequest> argument = ArgumentCaptor.forClass(SearchApiRequest.class);
+        verify(searchMock2).executeRequest(argument.capture());
+        assertEquals(query, argument.getValue().getQueryString());
+        assertEquals(2, argument.getValue().getPage());
+        assertEquals(SearchViewModel.SearchStatus.RUNNING, viewModel.getSearchStatus().getValue());
+        verify(sFactoryMock, times(3)).createSearchTask(viewModel);
     }
 }

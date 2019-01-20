@@ -72,6 +72,8 @@ public class SearchViewModel extends ViewModel implements SearchExecutor.Callbac
     public void retry() {
         if (mCurrentPage == 0) {
             search(mSearchQuery);
+        }else {
+            fetchNextPage();
         }
     }
 
