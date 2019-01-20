@@ -28,6 +28,7 @@ public class SearchFragment extends Fragment implements SearchAdapter.Callback {
     private RecyclerView mPhotoList;
     private SearchAdapter mAdapter;
     private View mProgressView;
+    private View mErrorView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,9 +61,17 @@ public class SearchFragment extends Fragment implements SearchAdapter.Callback {
                 public void onChanged(@Nullable SearchViewModel.SearchStatus searchStatus) {
                     if (searchStatus == SearchViewModel.SearchStatus.IDLE) {
                         mProgressView.setVisibility(View.GONE);
+                        mErrorView.setVisibility(View.GONE);
                     }
                     else if(searchStatus == SearchViewModel.SearchStatus.RUNNING && mViewModel.getCurrentPage()==0) {
                         mProgressView.setVisibility(View.VISIBLE);
+                        mErrorView.setVisibility(View.GONE);
+                    }
+                    else if(searchStatus == SearchViewModel.SearchStatus.ERROR) {
+                        if (mViewModel.getCurrentPage() == 0) {
+                            mErrorView.setVisibility(View.VISIBLE);
+                        }
+                        mProgressView.setVisibility(View.GONE);
                     }
                 }
             });
@@ -78,6 +87,7 @@ public class SearchFragment extends Fragment implements SearchAdapter.Callback {
         mPhotoList.setAdapter(mAdapter);
 
         mProgressView = root.findViewById(R.id.search_progress_view);
+        mErrorView = root.findViewById(R.id.error_view);
         return root;
     }
 

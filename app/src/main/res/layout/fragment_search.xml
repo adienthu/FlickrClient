@@ -26,4 +26,12 @@
 
     </FrameLayout>
 
+    <TextView
+        android:id="@+id/error_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:background="@android:color/white"
+        android:text="@string/photo_search_failed"/>
+
 </FrameLayout>
