@@ -47,7 +47,7 @@ public class SearchFragment extends Fragment implements SearchAdapter.Callback {
                 @Override
                 public void onChanged(@Nullable List<Photo> photos) {
                     if (photos != null) {
-                        if (mViewModel.getCurrentPage() == 1) {
+                        if (mViewModel.getCurrentPage() == 1 || mAdapter.getItemCount() == 0) { // due to configuration change the adapter's list would be empty
                             mAdapter.refreshList(photos);
                         }else if(mViewModel.getCurrentPage() > 1) {
                             int currentCount = mAdapter.getItemCount();
@@ -90,9 +90,15 @@ public class SearchFragment extends Fragment implements SearchAdapter.Callback {
                         if (mViewModel.getCurrentPage() == 0) {
                             mErrorView.setVisibility(View.VISIBLE);
                             mProgressView.setVisibility(View.GONE);
+
+                            mTopProgressView.setVisibility(View.GONE);
+                            mTopErrorView.setVisibility(View.GONE);
                         }else {
                             mTopErrorView.setVisibility(View.VISIBLE);
                             mTopProgressView.setVisibility(View.GONE);
+
+                            mProgressView.setVisibility(View.GONE);
+                            mErrorView.setVisibility(View.GONE);
                         }
 
                     }
