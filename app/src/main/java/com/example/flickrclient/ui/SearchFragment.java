@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.example.flickrclient.R;
 import com.example.flickrclient.model.Photo;
@@ -26,6 +27,7 @@ public class SearchFragment extends Fragment implements SearchAdapter.Callback {
     private SearchViewModel mViewModel;
     private RecyclerView mPhotoList;
     private SearchAdapter mAdapter;
+    private View mProgressView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,6 +54,18 @@ public class SearchFragment extends Fragment implements SearchAdapter.Callback {
                     }
                 }
             });
+
+            mViewModel.getSearchStatus().observe(this, new Observer<SearchViewModel.SearchStatus>() {
+                @Override
+                public void onChanged(@Nullable SearchViewModel.SearchStatus searchStatus) {
+                    if (searchStatus == SearchViewModel.SearchStatus.IDLE) {
+                        mProgressView.setVisibility(View.GONE);
+                    }
+                    else if(searchStatus == SearchViewModel.SearchStatus.RUNNING && mViewModel.getCurrentPage()==0) {
+                        mProgressView.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
         }
     }
 
@@ -62,6 +76,8 @@ public class SearchFragment extends Fragment implements SearchAdapter.Callback {
         mPhotoList = root.findViewById(R.id.search_result_list);
         mPhotoList.setLayoutManager(new GridLayoutManager(getContext(), NUM_COLUMNS));
         mPhotoList.setAdapter(mAdapter);
+
+        mProgressView = root.findViewById(R.id.search_progress_view);
         return root;
     }
 
