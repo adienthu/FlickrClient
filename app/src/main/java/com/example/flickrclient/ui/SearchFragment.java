@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.example.flickrclient.R;
@@ -29,6 +30,7 @@ public class SearchFragment extends Fragment implements SearchAdapter.Callback {
     private SearchAdapter mAdapter;
     private View mProgressView;
     private View mErrorView;
+    private Button mRetryButton;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,6 +90,14 @@ public class SearchFragment extends Fragment implements SearchAdapter.Callback {
 
         mProgressView = root.findViewById(R.id.search_progress_view);
         mErrorView = root.findViewById(R.id.error_view);
+        mRetryButton = mErrorView.findViewById(R.id.retry_button);
+        mRetryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mViewModel != null)
+                    mViewModel.retry();
+            }
+        });
         return root;
     }
 

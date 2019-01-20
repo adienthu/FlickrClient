@@ -2,5 +2,6 @@
     <string name="app_name">FlickrClient</string>
     <string name="search_hint">Search photos...</string>
     <string name="searching_for_photos">Searching for photos</string>
-    <string name="photo_search_failed">Photo search failed.</string>
+    <string name="photo_search_failed">Photo search failed. Check your network connection and try again.</string>
+    <string name="retry">RETRY</string>
 </resources>
