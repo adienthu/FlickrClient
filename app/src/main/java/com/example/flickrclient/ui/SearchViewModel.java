@@ -30,6 +30,7 @@ public class SearchViewModel extends ViewModel implements SearchExecutor.Callbac
     private String mSearchQuery;
     private MutableLiveData<SearchStatus> mSearchStatus;
     private MutableLiveData<List<Photo>> mPhotos;
+    private int mCurrentPage;
     private int mNumPagesRemaining;
 
     public SearchViewModel() {
@@ -51,6 +52,8 @@ public class SearchViewModel extends ViewModel implements SearchExecutor.Callbac
         if (query!=null && !query.isEmpty() && !query.equalsIgnoreCase(mSearchQuery))
         {
             mSearchQuery = query;
+            mCurrentPage = 0;
+            mNumPagesRemaining = 0;
             mSearchStatus.setValue(SearchStatus.RUNNING);
             if (mSearchExecutor != null)
             {
@@ -58,6 +61,21 @@ public class SearchViewModel extends ViewModel implements SearchExecutor.Callbac
             }
             mSearchExecutor = FactoryLocator.getFactory().createSearchTask(this);
             SearchApiRequest request = new SearchApiRequest(query, 1, NUM_RESULTS_PER_PAGE);
+            mSearchExecutor.executeRequest(request);
+        }
+    }
+
+    public int getCurrentPage() {
+        return mCurrentPage;
+    }
+
+    public void fetchNextPage()
+    {
+        if (mSearchStatus.getValue() != SearchStatus.RUNNING && mNumPagesRemaining > 0)
+        {
+            mSearchStatus.setValue(SearchStatus.RUNNING);
+            SearchApiRequest request = new SearchApiRequest(mSearchQuery, mCurrentPage+1, NUM_RESULTS_PER_PAGE);
+            mSearchExecutor = FactoryLocator.getFactory().createSearchTask(this);
             mSearchExecutor.executeRequest(request);
         }
     }
@@ -77,13 +95,15 @@ public class SearchViewModel extends ViewModel implements SearchExecutor.Callbac
                     mPhotos.setValue(photos);
                 }
             }
-
+            mCurrentPage = response.getPage();
+            mNumPagesRemaining = response.getNumPagesRemaining();
             mSearchStatus.setValue(SearchStatus.IDLE);
         }else if (response.getStatus() == SearchApiResponse.Status.ERROR) {
             mSearchStatus.setValue(SearchStatus.ERROR);
+            mSearchQuery = null;
         }else {
             mSearchStatus.setValue(SearchStatus.IDLE);
+            mSearchQuery = null;
         }
-
     }
 }
