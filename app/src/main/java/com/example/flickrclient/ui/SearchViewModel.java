@@ -85,17 +85,19 @@ public class SearchViewModel extends ViewModel implements SearchExecutor.Callbac
         if (response.getStatus() == SearchApiResponse.Status.SUCCESS)
         {
             if (response.getPage() == 1) {
+                mCurrentPage = response.getPage();
                 List<Photo> photos = new ArrayList<>(response.getPhotos());
                 mPhotos.setValue(photos);
             } else if (response.getPage() > 1) {
                 List<Photo> photos = mPhotos.getValue();
                 if (photos != null)
                 {
+                    mCurrentPage = response.getPage();
                     photos.addAll(response.getPhotos());
                     mPhotos.setValue(photos);
                 }
             }
-            mCurrentPage = response.getPage();
+
             mNumPagesRemaining = response.getNumPagesRemaining();
             mSearchStatus.setValue(SearchStatus.IDLE);
         }else if (response.getStatus() == SearchApiResponse.Status.ERROR) {

@@ -19,6 +19,7 @@ import com.example.flickrclient.service.photodownload.PhotoDownloadResponse;
 import com.example.flickrclient.service.photodownload.PhotoDownloader;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,9 +30,11 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
 
     private List<Photo> mPhotos;
     private ExecutorService mTaskExecutor = Executors.newCachedThreadPool();
+    private WeakReference<Callback> mCallbackRef;
 
-    public SearchAdapter(List<Photo> photos) {
-        mPhotos = photos;
+    public SearchAdapter(List<Photo> photos, Callback callback) {
+        mPhotos = new ArrayList<>(photos);
+        mCallbackRef = new WeakReference<>(callback);
     }
 
     @NonNull
@@ -46,6 +49,12 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
         Photo photo = mPhotos.get(i);
         searchViewHolder.mTitleView.setText(photo.getTitle());
         searchViewHolder.bindPhoto(photo.getUrl());
+        if (i == mPhotos.size()-1) {
+            Callback callback = mCallbackRef.get();
+            if (callback != null) {
+                callback.onReachedEndOfList();
+            }
+        }
     }
 
     @Override
@@ -54,8 +63,13 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
     }
 
     public void refreshList(List<Photo> photos) {
-        mPhotos = photos;
+        mPhotos = new ArrayList<>(photos);
         notifyDataSetChanged();
+    }
+
+    public void addPhotos(int currentCount, List<Photo> newPhotos) {
+        mPhotos.addAll(currentCount, newPhotos);
+        notifyItemRangeInserted(currentCount, newPhotos.size());
     }
 
     class SearchViewHolder extends RecyclerView.ViewHolder implements PhotoDownloader.Callback, PhotoDecodeTask.Callback
@@ -118,5 +132,9 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
                 mPhotoView.setImageBitmap(result.getBitmap());
             }
         }
+    }
+
+    interface Callback {
+        void onReachedEndOfList();
     }
 }
